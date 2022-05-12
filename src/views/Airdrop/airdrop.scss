@@ -1,17 +1,21 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
 
-#swappage-view {
+#airdrop-view {
   overflow-y: hidden;
   overflow-x: hidden;
   height: 100%;
   min-width: 300px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
   overflow-y: auto;
-  -ms-overflow-style: none !important; /* IE and Edge */
-  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important;
+  /* IE and Edge */
+  scrollbar-width: none !important;
+
+  /* Firefox */
   &::-webkit-scrollbar {
     display: none !important;
   }
@@ -20,40 +24,116 @@
     max-width: unset !important;
     width: 100%;
     margin: auto;
+
     .card-header {
       margin-bottom: 1rem;
     }
+
     &.ohm-chart-card {
       .chart-card-header {
         padding: 0px 20px !important;
         min-width: 300px;
       }
+
       height: 355px;
     }
   }
+
   .hero-metrics {
     width: 100%;
     margin-bottom: 23px;
     text-align: center;
+
     .ohm-card {
       max-width: unset !important;
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: space-evenly;
+
       h5 {
         font-weight: bold;
       }
     }
   }
+
   .data-grid {
     overflow: hidden;
   }
 
-  .swapcard  {
+  .title-small {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 16px;
+    line-height: 20px;
+    /* identical to box height */
+
+    letter-spacing: 0.15em;
+
+    color: #0495B7;
+  }
+
+  .title-medium {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 40px;
+    line-height: 49px;
+    /* identical to box height */
+
+    letter-spacing: 0.105em;
+
+    color: #FFFFFF;
+  }
+
+  .title-big {
+    margin-top: 80px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 32px;
+    line-height: 39px;
+    /* identical to box height */
+
+    letter-spacing: -0.02em;
+
+    color: #545454;
+  }
+
+  .avatar-control-container {
+    min-height: 60px;
+    min-width: 450px;
+    margin-top: 20px;
+    margin-bottom: 50px;
+
+    background: #FFFFFF;
+    box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
+    border-radius: 22px;
+  }
+
+  .progressbar-container {
+    padding: 0px;
+
+    .MuiLinearProgress-root {
+      height: 11px;
+      border-radius: 65px;
+      overflow: hidden;
+      position: relative;
+      background: #fff;
+    }
+
+    .MuiLinearProgress-barColorPrimary {
+      border-radius: 48px;
+      background: linear-gradient(90deg, #3f63ae 0%, #42DACE 100%);
+    }
+  }
+
+  .airdrop {
     display: flex;
-    justify-content: center;
-    flex-direction: row;
+    justify-content: flex-start;
+    flex-direction: column;
     margin-top: 40px;
+
     @media (max-width: 1100px) {
       flex-direction: column;
     }
@@ -62,20 +142,24 @@
       padding: 32px;
       margin: 0 20px;
       display: flex;
-      width: 480px;
+      width: 280px;
       flex-direction: column;
-//      background-color: #000D56 !important;
+      //      background-color: #000D56 !important;
       border: 0.5px solid rgba(255, 255, 255, 0.5);
       background: #FFFFFF;
       box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
       border-radius: 22px;
     }
+
+
+
     .network-swtich-button-container {
       z-index: 0;
       display: flex;
       align-items: center;
       justify-content: center;
     }
+
     .button {
       z-index: 0;
       width: 64px;
@@ -121,7 +205,7 @@
       margin-left: 10px;
     }
   }
- 
+
   .swap-button-container {
     display: flex;
     justify-content: center;
@@ -149,19 +233,21 @@
   }
 
 
-  
+
 }
 
 .smaller {
   .ohm-card {
     width: 97%;
   }
+
   .hero-metrics .ohm-card {
-    > .MuiBox-root {
+    >.MuiBox-root {
       flex-direction: column;
       align-items: flex-start;
       flex-wrap: wrap;
     }
+
     div.metric {
       text-align: left !important;
     }
@@ -174,6 +260,7 @@
     min-width: 30% !important;
     max-width: 60%;
     text-align: left !important;
+
     &.market,
     &.price,
     &.wsoprice,
@@ -188,7 +275,7 @@
 
 .very-small {
   .hero-metrics .ohm-card {
-    > .MuiBox-root {
+    >.MuiBox-root {
       flex-direction: column;
       justify-content: center;
     }
@@ -231,4 +318,9 @@
 
 .MuiCircularProgress-colorSecondary {
   color: #4e84f4 !important;
+}
+
+.page-container {
+  display: flex;
+  justify-content: space-between;
 }

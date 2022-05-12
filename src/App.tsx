@@ -18,7 +18,7 @@ import { loadAccountDetails, calculateUserBondDetails, getMigrationAllowances } 
 import { getZapTokenBalances } from "./slices/ZapSlice";
 import { info } from "./slices/MessagesSlice";
 import { ethers } from "ethers";
-import { Presale } from "./views";
+import { Airdrop } from "./views";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
 import TopBar from "./components/TopBar/TopBar.jsx";
 import CallToAction from "./components/CallToAction/CallToAction";
@@ -277,7 +277,7 @@ function App() {
           <Switch>
             <Route path="/">
               <Route exact path={`/`}>
-                <Presale />
+                <Airdrop />
               </Route>
             </Route>
             <Route path="/network">

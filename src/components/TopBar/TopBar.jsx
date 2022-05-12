@@ -1,4 +1,5 @@
-import { AppBar, Toolbar, Box, Button, SvgIcon } from "@material-ui/core";
+import { useCallback, useState } from "react";
+import { AppBar, Toolbar, Box, Button, SvgIcon, Link, Typography, Menu } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { ReactComponent as MenuIcon } from "../../assets/icons/hamburger.svg";
@@ -9,6 +10,7 @@ import LocaleSwitcher from "./LocaleSwitch.tsx";
 import ConnectMenu from "./ConnectMenu.jsx";
 import "./topbar.scss";
 import NetworkMenu from "./NetworkMenu.jsx";
+import { NavLink } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -18,9 +20,9 @@ const useStyles = makeStyles(theme => ({
     },
     justifyContent: "flex-end",
     alignItems: "flex-end",
-    background: "#2225",
+    background: "#fff",
     backdropFilter: "none",
-    marginBottom: "20px",
+    marginBottom: "80px",
     zIndex: 10,
   },
   menuButton: {
@@ -36,6 +38,11 @@ const useStyles = makeStyles(theme => ({
     alignItems: "center",
     paddingLeft: "20px",
   },
+  menu: {
+    display: "flex",
+    justifyContent: "flex-start",
+    paddingLeft: "30px",
+  },
   logoTitle: {
     fontFamily: "Montserrat",
     fontStyle: "normal",
@@ -45,27 +52,138 @@ const useStyles = makeStyles(theme => ({
     letterSpacing: "0.18em",
     color: "#6D83FB",
   },
+  buttonProp: {
+    paddingLeft: "20px",
+    fontFamily: 'Montserrat',
+    fontStyle: "normal",
+    fontWeight: "700",
+    fontSize: "14px",
+    lineHeight: "17px",
+    letterSpacing: "0.175em",
+    color: "#3F3F3F",
+  },
+  searchbar: {
+    background: "#FFFFFF",
+    boxShadow: "2px 2px 9px rgba(0, 0, 0, 0.25)",
+    borderRadius: "50px",
+    minWidth: "100px",
+    alignSelf: "center",
+    minHeight: "30px"
+  },
 }));
 
 function TopBar({ theme, toggleTheme, handleDrawerToggle }) {
   const classes = useStyles();
+
+  const [isActive] = useState();
+
+  const checkPage = useCallback((match, location, page) => {
+    const currentPath = location.pathname.replace("/", "");
+    if (currentPath.indexOf("dashboard") >= 0 && page === "dashboard") {
+      return true;
+    }
+    if (currentPath.indexOf("stake") >= 0 && page === "stake") {
+      return true;
+    }
+    if (currentPath.indexOf("home") >= 0 && page === "home") {
+      return true;
+    }
+    if (currentPath.indexOf("state") >= 0 && page === "state") {
+      return true;
+    }
+    if (currentPath.indexOf("wallet") >= 0 && page === "wallet") {
+      return true;
+    }
+    if (currentPath.indexOf("swap") >= 0 && page === "swap") {
+      return true;
+    }
+    return false;
+  }, []);
 
   const Logo = () => {
     return (
       <div className={classes.logo}>
         <img src="/logo192.png" height="64px" />
         <span className={classes.logoTitle}>|SPOZZ</span>
+        <Menu />
       </div>
     );
   };
 
+  const Menu = () => {
+    return (
+      <div className={classes.menu}>
+        <Link
+          component={NavLink}
+          id="dash-nav"
+          to="/dashboard"
+          isActive={(match, location) => {
+            return checkPage(match, location, "dashboard");
+          }}
+          className={`button-dapp-menu ${isActive ? "active" : ""}`}
+        >
+          <Typography variant="h3" className={classes.buttonProp} >
+            CREATE
+          </Typography>
+        </Link>
+
+        <Link
+          component={NavLink}
+          id="stake-nav"
+          to="/stake"
+          isActive={(match, location) => {
+            return checkPage(match, location, "stake");
+          }}
+        // className={`button-dapp-menu ${isActive ? "active" : ""}`}
+        >
+          <Typography variant="h3" className={classes.buttonProp}>
+            GALLERY
+          </Typography>
+        </Link>
+        <Link
+          component={NavLink}
+          id="home-nav"
+          to="/home"
+          isActive={(match, location) => {
+            return checkPage(match, location, "home");
+          }}
+        // className={`button-dapp-menu ${isActive ? "active" : ""}`}
+        >
+          <Typography variant="h3" className={classes.buttonProp}>
+            STATSTICS
+          </Typography>
+        </Link>
+        <Link
+          component={NavLink}
+          id="home-nav"
+          to="/home"
+          isActive={(match, location) => {
+            return checkPage(match, location, "home");
+          }}
+        // className={`button-dapp-menu ${isActive ? "active" : ""}`}
+        >
+          <Typography variant="h3" className={classes.buttonProp}>
+            COMMUNITY
+          </Typography>
+        </Link>
+      </div>
+    )
+  }
+
+  const SearchBar = () => {
+    return (
+      <div className={classes.searchbar}>
+          asdf
+      </div>
+    )
+  }
   return (
     <AppBar position="sticky" className={classes.appBar} elevation={0}>
       <Toolbar disableGutters className="dapp-topbar">
         <Box display="flex" justifyContent="space-between" width="100%">
           <Logo />
           <div style={{ display: "flex", justifyContent: "center" }}>
-            <OhmMenu />
+            <SearchBar />
             <ConnectMenu theme={theme} />
           </div>
         </Box>
