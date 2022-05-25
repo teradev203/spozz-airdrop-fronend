@@ -1,7 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { BigNumber, ethers } from "ethers";
 import { addresses } from "src/constants";
-import { CrossChainMigrator__factory, IERC20, IERC20__factory } from "src/typechain";
 import {
   IActionValueAsyncThunk,
   IBaseAddressAsyncThunk,
@@ -9,7 +8,7 @@ import {
   IJsonRPCError,
   IValueAsyncThunk,
 } from "./interfaces";
-import { fetchAccountSuccess, getBalances, getMigrationAllowances, loadAccountDetails } from "./AccountSlice";
+import { fetchAccountSuccess, getBalances } from "./AccountSlice";
 import { error, info } from "../slices/MessagesSlice";
 import { clearPendingTxn, fetchPendingTxns } from "./PendingTxnsSlice";
 import { OlympusTokenMigrator__factory } from "src/typechain";
@@ -20,76 +19,6 @@ enum TokenType {
   STAKED,
   WRAPPED,
 }
-
-const chooseContract = (token: string, networkID: NetworkID, signer: ethers.providers.JsonRpcSigner): IERC20 => {
-  let address: string;
-  if (token === "ohm") {
-    address = addresses[networkID].OHM_ADDRESS;
-  } else if (token === "sohm") {
-    address = addresses[networkID].SOHM_ADDRESS;
-  } else if (token === "wsohm") {
-    address = addresses[networkID].WSOHM_ADDRESS;
-  } else if (token === "gohm") {
-    address = addresses[networkID].GOHM_ADDRESS;
-  } else {
-    const message = `Invalid token type: ${token}`;
-    console.error(message);
-    throw Error(message);
-  }
-  return IERC20__factory.connect(address, signer);
-};
-
-export const changeMigrationApproval = createAsyncThunk(
-  "migrate/changeApproval",
-  async (
-    { token, provider, address, networkID, displayName, insertName }: IChangeApprovalWithDisplayNameAsyncThunk,
-    { dispatch },
-  ) => {
-    // NOTE (Appleseed): what is `insertName`??? it looks like it's always true???
-    if (!provider) {
-      dispatch(error("Please connect your wallet!"));
-      return;
-    }
-    const signer = provider.getSigner();
-    const tokenContract = chooseContract(token, networkID, signer);
-
-    let migrateAllowance = BigNumber.from("0");
-    let currentBalance = BigNumber.from("0");
-    migrateAllowance = await tokenContract.allowance(address, addresses[networkID].MIGRATOR_ADDRESS);
-    currentBalance = await tokenContract.balanceOf(address);
-
-    // return early if approval has already happened
-    if (migrateAllowance.gt(currentBalance)) {
-      dispatch(info("Approval completed."));
-      dispatch(getMigrationAllowances({ address, provider, networkID }));
-      return;
-    }
-    let approveTx: ethers.ContractTransaction | undefined;
-    try {
-      approveTx = await tokenContract.approve(
-        addresses[networkID].MIGRATOR_ADDRESS,
-        ethers.utils.parseUnits("1000000000", token === "wsohm" || token === "gohm" ? "ether" : "gwei").toString(),
-      );
-
-      const text = `Approve ${displayName} Migration`;
-      const pendingTxnType = insertName ? `approve_migration_${token}` : "approve_migration";
-
-      dispatch(fetchPendingTxns({ txnHash: approveTx.hash, text, type: pendingTxnType }));
-      await approveTx.wait();
-      dispatch(info(`${displayName} Approval complete`));
-    } catch (e: unknown) {
-      dispatch(error((e as IJsonRPCError).message));
-      return;
-    } finally {
-      if (approveTx) {
-        dispatch(clearPendingTxn(approveTx.hash));
-        dispatch(getMigrationAllowances({ address, provider, networkID }));
-      }
-    }
-
-    // go get fresh allowances
-  },
-);
 
 interface IMigrationWithType extends IActionValueAsyncThunk {
   type: String;

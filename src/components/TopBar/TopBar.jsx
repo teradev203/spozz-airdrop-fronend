@@ -11,6 +11,12 @@ import ConnectMenu from "./ConnectMenu.jsx";
 import "./topbar.scss";
 import NetworkMenu from "./NetworkMenu.jsx";
 import { NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import ethereum from "../../assets/tokens/wETH.svg";
+import arbitrum from "../../assets/arbitrum.png";
+import avalanche from "../../assets/tokens/AVAX.svg";
+import polygon from "../../assets/tokens/polygon.svg";
+import binance from "../../assets/binance.png";
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -22,7 +28,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: "flex-end",
     background: "#fff",
     backdropFilter: "none",
-    marginBottom: "80px",
+    marginBottom: "10px",
     zIndex: 10,
   },
   menuButton: {
@@ -63,17 +69,22 @@ const useStyles = makeStyles(theme => ({
     color: "#3F3F3F",
   },
   searchbar: {
+    display: "flex",
+    justifyContent: "center",
     background: "#FFFFFF",
+    fontSize: "16px",
+    fontWeight: "400",
     boxShadow: "2px 2px 9px rgba(0, 0, 0, 0.25)",
     borderRadius: "50px",
-    minWidth: "100px",
+    minWidth: "150px",
     alignSelf: "center",
-    minHeight: "30px"
+    minHeight: "40px"
   },
 }));
 
 function TopBar({ theme, toggleTheme, handleDrawerToggle }) {
   const classes = useStyles();
+  const networkName = useSelector(state => state.network.networkName);
 
   const [isActive] = useState();
 
@@ -116,7 +127,7 @@ function TopBar({ theme, toggleTheme, handleDrawerToggle }) {
         <Link
           component={NavLink}
           id="dash-nav"
-          to="/dashboard"
+          to="#"
           isActive={(match, location) => {
             return checkPage(match, location, "dashboard");
           }}
@@ -130,7 +141,7 @@ function TopBar({ theme, toggleTheme, handleDrawerToggle }) {
         <Link
           component={NavLink}
           id="stake-nav"
-          to="/stake"
+          to="#"
           isActive={(match, location) => {
             return checkPage(match, location, "stake");
           }}
@@ -143,7 +154,7 @@ function TopBar({ theme, toggleTheme, handleDrawerToggle }) {
         <Link
           component={NavLink}
           id="home-nav"
-          to="/home"
+          to="#"
           isActive={(match, location) => {
             return checkPage(match, location, "home");
           }}
@@ -156,7 +167,7 @@ function TopBar({ theme, toggleTheme, handleDrawerToggle }) {
         <Link
           component={NavLink}
           id="home-nav"
-          to="/home"
+          to="#"
           isActive={(match, location) => {
             return checkPage(match, location, "home");
           }}
@@ -171,12 +182,33 @@ function TopBar({ theme, toggleTheme, handleDrawerToggle }) {
   }
 
   const SearchBar = () => {
+    const getNetworkIcon = () => {
+      if (networkName == "ETH")
+        return ethereum;
+      if (networkName == "BSC")
+        return binance;
+      if (networkName == "Polygon")
+        return polygon;
+
+      return ethereum;
+    }
+
     return (
       <div className={classes.searchbar}>
-          asdf
+        <div style={{ display: "flex", justifyContent: "center", flexDirection: "column" }}>
+          <div>
+            <Link component={NavLink} to="/network">
+              <div style={{ color: "black", display: "flex" }}>
+                <div style={{display: "flex"}}><img src={getNetworkIcon()} width="25px" height="25px" /></div>
+                <div style={{alignSelf: "center", marginLeft: "5px"}}>{networkName}</div>
+              </div>
+            </Link>
+          </div>
+        </div>
       </div>
     )
   }
+
   return (
     <AppBar position="sticky" className={classes.appBar} elevation={0}>
       <Toolbar disableGutters className="dapp-topbar">

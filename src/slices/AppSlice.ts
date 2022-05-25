@@ -54,7 +54,7 @@ export const loadAppDetails = createAsyncThunk(
       ).unwrap();
 
       const tazorContract = new ethers.Contract(
-        addresses[networkID].OHM_ADDRESS as string,
+        addresses[networkID].SPOZZ_ADDRESS as string,
         ierc20Abi,
         provider,
       ) as IERC20;
@@ -180,7 +180,7 @@ const loadMarketPrice = createAsyncThunk(
       tazMarketCap = await getTazMarketCap({ networkID, provider, address });
       tazorMarketCap = await getTazorMarketCap({ networkID, provider, address });
       const tazorContract = new ethers.Contract(
-        addresses[networkID].OHM_ADDRESS as string,
+        addresses[networkID].SPOZZ_ADDRESS as string,
         ierc20Abi,
         provider,
       ) as IERC20;

@@ -109,8 +109,9 @@ export interface IBridgeApproveAsyncThunk extends IBaseAsyncThunk {
   readonly address: string;
 }
 
-export interface IBridgeSwapAsyncThunk extends IBaseAsyncThunk {
-  readonly amount: number;
-  readonly address: string;
-  readonly dstNetworkID: NetworkID;
+export interface IAirdropAsyncThunk extends IBaseAsyncThunk {
+  readonly nfts:[];
+  readonly xnfts:[];
+  readonly ids:[];
+  readonly xids:[];
 }

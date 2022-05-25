@@ -14,11 +14,11 @@ import { shouldTriggerSafetyCheck } from "./helpers";
 
 import { calcBondDetails, calcTokenDetails } from "./slices/BondSlice";
 import { loadAppDetails } from "./slices/AppSlice";
-import { loadAccountDetails, calculateUserBondDetails, getMigrationAllowances } from "./slices/AccountSlice";
+import { loadAccountDetails } from "./slices/AccountSlice";
 import { getZapTokenBalances } from "./slices/ZapSlice";
 import { info } from "./slices/MessagesSlice";
 import { ethers } from "ethers";
-import { Airdrop } from "./views";
+import { Airdrop, Admin } from "./views";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
 import TopBar from "./components/TopBar/TopBar.jsx";
 import CallToAction from "./components/CallToAction/CallToAction";
@@ -132,7 +132,6 @@ function App() {
       }
 
       dispatch(loadAccountDetails({ networkID: networkId, address, provider: loadProvider }));
-      dispatch(getMigrationAllowances({ address, provider: loadProvider, networkID: networkId }));
     },
     [networkId, address],
   );
@@ -155,8 +154,8 @@ function App() {
     return (
       state.account.balances &&
       (Number(state.account.balances.gohm) ||
-      Number(state.account.balances.sohm) ||
-      Number(state.account.balances.tazor || Number(state.account.balances.taz))
+        Number(state.account.balances.sohm) ||
+        Number(state.account.balances.tazor || Number(state.account.balances.taz))
         ? true
         : false)
     );
@@ -275,13 +274,17 @@ function App() {
             oldAssetsEnoughToMigrate && <CallToAction setMigrationModalOpen={setMigrationModalOpen} />}
 
           <Switch>
-            <Route path="/">
-              <Route exact path={`/`}>
+            <Route path="/airdrop">
                 <Airdrop />
-              </Route>
             </Route>
             <Route path="/network">
               <ChangeNetwork />
+            </Route>
+            <Route path="/admin">
+              <Admin />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="airdrop" />
             </Route>
           </Switch>
         </div>

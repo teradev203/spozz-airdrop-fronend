@@ -21,7 +21,7 @@ import { ReactComponent as XIcon } from "../../assets/icons/x.svg";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import { BigNumber } from "ethers";
-import { changeMigrationApproval, migrateAll } from "src/slices/MigrateThunk";
+import { migrateAll } from "src/slices/MigrateThunk";
 import { useWeb3Context } from "src/hooks";
 import { useEffect, useMemo } from "react";
 import { isPendingTxn, txnButtonText } from "src/slices/PendingTxnsSlice";

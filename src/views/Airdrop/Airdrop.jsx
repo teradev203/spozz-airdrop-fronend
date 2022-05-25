@@ -27,14 +27,18 @@ import TabPanel from "../../components/TabPanel";
 import CardHeader from "../../components/CardHeader/CardHeader";
 import CustomInput from "../../components/CustomInput/CustomInput";
 import { NavLink } from "react-router-dom";
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 import { useState, useEffect } from "react";
 import { switchNetwork, initializeNetwork } from "../../slices/NetworkSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { Skeleton } from "@material-ui/lab";
+
 import { useWeb3Context } from "../../hooks/web3Context";
 import { useAppSelector } from "src/hooks";
 import { error, info } from "../../slices/MessagesSlice";
 import { loadAccountDetails } from "../../slices/AccountSlice";
-import { swapToken, approveToken } from "../../slices/PresaleThunk";
+import { airdropSpozz } from "../../slices/AirdropThunk";
 import { isPendingTxn, txnButtonText } from "src/slices/PendingTxnsSlice";
 import ethereum from "../../assets/tokens/wETH.svg";
 import arbitrum from "../../assets/arbitrum.png";
@@ -44,6 +48,18 @@ import binance from "../../assets/binance.png";
 
 import "./airdrop.scss";
 
+const airdropUnits = {
+  avatar: 50,
+  nft: 10,
+  specialNFT: 30,
+  whitelist: 30
+}
+
+const spozzAirdropInfo = {
+  totalSupply: 10000,
+  airdropAmount: "10%",
+  // whitelistCo
+}
 
 // export function Airdrop({ srcSwapBalance, setSrcSwapCallback }) {
 export default function Airdrop() {
@@ -56,30 +72,37 @@ export default function Airdrop() {
   const isSmallScreen = useMediaQuery("(max-width: 650px)");
   const isVerySmallScreen = useMediaQuery("(max-width: 379px)");
 
-  const handleClickOpen = (e) => {
-    console.log("Button Object", e);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   // const [dstSwapBalance, setDstSwapBalance] = useState(0);
   const srcSpotBalance = useAppSelector(state => {
     return state.account.balances && state.account.balances.srcSpotBalance;
   });
 
-  const dstSpotBalance = useAppSelector(state => {
-    return state.account.balances && state.account.balances.dstSpotBalance;
+  const balances = useAppSelector(state => {
+    return state.account.balances && state.account.balances;
   });
 
-  const spotBalances = useAppSelector(state => {
-    return state.account.balances && state.account.balances.spotBalances;
+  const avatarOwned = useAppSelector(state => {
+    return state.account.balances && state.account.balances.avatarBalance;
   });
 
-  const tokenAllowance = useAppSelector(state => {
-    return state.account.balances && state.account.balances.tokenAllowance;
+  const nftListed = useAppSelector(state => {
+    return state.account.balances && state.account.balances.nftBalances && state.account.balances.nftBalances.length;
+  });
+
+  const specialNFT = useAppSelector(state => {
+    return state.account.balances && state.account.balances.xnftBalances && state.account.balances.xnftBalances.length;
+  });
+
+  const isWhitelist = useAppSelector(state => {
+    return state.account.balances && state.account.balances.isWhitelist;
+  });
+
+  const isReceived = useAppSelector(state => {
+    return state.account.balances && state.account.balances.isReceived;
+  });
+
+  const airdropBalance = useAppSelector(state => {
+    return state.account.balances && state.account.balances.airdropBalance;
   });
 
   const pendingTransactions = useAppSelector(state => {
@@ -97,10 +120,6 @@ export default function Airdrop() {
   };
 
   const networkId = useAppSelector(state => state.network.networkId);
-
-  const [srcNetIndex, setSrcNetIndex] = useState(0);
-  const [dstNetworkList, setDestinationNetworkList] = useState([]);
-  const [dstNetIndex, setDstNetIndex] = useState(0);
 
   useEffect(() => {
     // don't load ANY details until wallet is Checked
@@ -125,58 +144,25 @@ export default function Airdrop() {
     // setDestinationNetworkList(list);
   }, [chainChanged, networkId, chainID, connected]);
 
-  const onApprove = async () => {
-    console.log(srcSpotBalance);
-    const totalBalance = Number(srcSpotBalance);
-    if (totalBalance < srcSwapBalance || totalBalance == 0) {
-      return dispatch(info("You have not enough balance."));
-    }
+  const onClaim = async () => {
+    let nfts = [];
+    let xnfts = [];
+    let ids = [];
+    let xids = [];
 
-    if (srcSwapBalance == 0)
-      return dispatch(info("Please input swap amount."));
+
+    nfts.push(balances.nftBalances[0].address);
     await dispatch(
-      approveToken({
-        amount: srcSwapBalance,
+      airdropSpozz({
+        nfts,
+        xnfts,
+        ids,
+        xids,
         provider,
         address,
         networkID: networkId,
-      }),
-    );
-
-    dispatch(loadAccountDetails({ networkID: networkId, address, provider }));
-  };
-
-  const onSwap = async () => {
-    const dstNetworkID = dstNetworkList[dstNetIndex].id;
-    const totalBalance = Number(srcSpotBalance);
-
-    setSwapButtonClicked(true);
-    if (totalBalance < srcSwapBalance || totalBalance == 0) {
-      setSwapButtonClicked(false);
-      return dispatch(info("You have not enough balance."));
-    }
-    if (srcSwapBalance == 0) {
-      setSwapButtonClicked(false);
-      return dispatch(info("Please input swap amount."));
-    }
-    await dispatch(
-      swapToken({
-        amount: srcSwapBalance,
-        provider,
-        address,
-        networkID: networkId,
-        dstNetworkID,
-      }),
-    );
-    setSwapButtonClicked(false);
-    setSrcSwapBalance(Number(0));
-  };
-
-  const setSrcSwapCallback = value => {
-    console.log(srcSwapBalance);
-    setSrcSwapBalance(value);
-    // setDstSwapBalance(value);
-  };
+      }));
+  }
 
   const onSrcNetworkChanged = id => {
     if (!connected) return dispatch(info("Please connect to wallet"));
@@ -191,10 +177,6 @@ export default function Airdrop() {
     });
   };
 
-  const onDstNetworkChanged = id => {
-    setDstNetIndex(id);
-  };
-
   const NetworkIcon = ({ list, id }) => {
     return (
       <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
@@ -204,43 +186,26 @@ export default function Airdrop() {
     );
   };
 
-  const SwapAlertDialog = () => {
-    return (
-      <div style={{ background: "#ff0 !important" }}>
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            <span style={{ color: "#fff", fontSize: "22px" }}>Confirm</span>
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              <span style={{ color: "#fff", fontSize: "20px" }}>Are you sure to swap SPOZZ token?</span>
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button variant="outlined" color="secondary" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button variant="outlined" color="secondary" onClick={onSwap} autoFocus>
-              Confirm
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-    );
-  };
+  const totalEarned = () => {
+    let total = 0;
+    if (nftListed)
+      total += nftListed * airdropUnits.nft;
+    if (specialNFT)
+      total += specialNFT * airdropUnits.specialNFT;
+    if (avatarOwned)
+      total += avatarOwned * airdropUnits.avatar;
+    if (isWhitelist)
+      total += airdropUnits.whitelist;
 
+    return total;
+  }
   return (
     // <Paper className="ohm-card">
-    <Grid container spacing={1}>
-      <Grid item xs={0} sm={0} md={2} lg={2} />
-      <Grid item xs={12} sm={12} md={6} lg={4} style={{ display: "flex" }}>
-        <div id="airdrop-view" className={`${isSmallScreen && "smaller"} ${isVerySmallScreen && "very-small"}`}>
-          <div>
+    <Grid container spacing={2}>
+      <Grid item md={12} lg={12} >
+        <Grid container spacing={2}>
+          <Grid item xs={0} sm={0} md={1} lg={3} />
+          <Grid item xs={12} sm={12} md={10} lg={6}>
             <div className="title-small">
               {"Presale & Airdropfor"}
             </div>
@@ -249,29 +214,215 @@ export default function Airdrop() {
               SPOZZ TOKEN
             </div>
             <hr />
-            <div className="title-big">
+            {/* <div className="title-big">
               Airdrop Amount
-            </div>
-            <div className="avatar-control-container"></div>
-            <div className="avatar-control-container"></div>
-            <div className="button-container">
-              <Button
-                variant="contained"
-                color="primary"
-                className="connect-button"
-                disabled={isPendingTxn(pendingTransactions, "approving")}
-                onClick={onApprove}
-              >
-                Approve
-              </Button>
-            </div>
-            <div className="progressbar-container">
-              <LinearProgress variant="determinate" value="50"/>
-            </div>
-          </div>
-        </div>
+            </div> */}
+          </Grid>
+        </Grid>
       </Grid>
-      {/* <Grid item xs={0} sm={3} md={2} lg={2} /> */}
+      <Grid item lg={12} >
+        <Grid container spacing={2}>
+
+          <Grid item xs={0} sm={0} md={1} lg={3} />
+          <Grid item xs={12} sm={12} md={10} lg={6} style={{ display: "flex" }}>
+            <Grid container spacing={2} className="card-container">
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                <div className="title-big">
+                  SPOZZ TOKEN Info
+                </div>
+              </Grid>
+              <Grid item xs={6} sm={6} md={3} lg={3} className="grid-item"  >
+                <div className="label-container">
+                  <span className="label-title">Total Supply</span>
+                  <div className="label-value">
+                    <span>400,000 SPOZZ</span>
+                  </div>
+                </div>
+              </Grid>
+              <Grid item xs={6} sm={6} md={3} lg={3} className="grid-item"  >
+                <div className="label-container">
+                  <span className="label-title">SPOZZ Price</span>
+                  <div className="label-value">
+                    <span>$0.01</span>
+                  </div>
+                </div>
+              </Grid>
+              <Grid item xs={6} sm={6} md={3} lg={3} className="grid-item"  >
+                <div className="label-container">
+                  <span className="label-title">Airrdop Amount</span>
+                  <div className="label-value">
+                    <span>10%</span>
+                  </div>
+                </div>
+              </Grid>
+              <Grid item xs={6} sm={6} md={3} lg={3} className="grid-item"  >
+                <div className="label-container">
+                  <span className="label-title">Whitelisted NFT</span>
+                  <div className="label-value">
+                    <span>130</span>
+                  </div>
+                </div>
+              </Grid>
+              <Grid item xs={6} sm={6} md={6} lg={6} className="grid-item"  >
+                <div className="label-container">
+                  <span className="label-title">Special NFT</span>
+                  <div className="label-value">
+                    <span>5</span>
+                  </div>
+                </div>
+              </Grid>
+              <Grid item xs={6} sm={6} md={6} lg={6} className="grid-item"  >
+                <div className="label-container">
+                  <span className="label-title">Whitelist Member</span>
+                  <div className="label-value">
+                    <span>1000</span>
+                  </div>
+                </div>
+              </Grid>
+              <Grid item xs={4} sm={64} md={4} lg={4} className="grid-item"  >
+                <div>Ethereum Sold 5679/10000 </div>
+                <div className="progressbar-container">
+                  <CircularProgressbar
+                    value={45}
+                    text={`45%`}
+                  />
+                </div>
+              </Grid>
+              <Grid item xs={4} sm={4} md={4} lg={4} className="grid-item"  >
+                <div>Baince Sold 5679/10000 </div>
+                <div className="progressbar-container">
+                  <CircularProgressbar value={29} text={`29%`} />
+                </div>
+              </Grid>
+              <Grid item xs={4} sm={4} md={4} lg={4} className="grid-item"  >
+                <div>Polygon Sold 5679/10000</div>
+                <div className="progressbar-container">
+                  <CircularProgressbar value={72} text={`72.45%`} />
+                </div>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item lg={12} >
+        <Grid container spacing={2}>
+          <Grid item xs={0} sm={0} md={1} lg={3} />
+          <Grid item xs={12} sm={12} md={10} lg={6} style={{ display: "flex" }}>
+            <Grid container spacing={2} className="card-container">
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                <div className="title-big">
+                  Private Activity
+                </div>
+              </Grid>
+              <Grid item xs={6} sm={6} md={3} lg={3} className="grid-item"  >
+                <div className="label-container">
+                  <div className="label-arrange">
+                    <span className="label-title">Avatar Owned</span>
+                    {
+                      avatarOwned != undefined ?
+                        <span className="label-title">{avatarOwned}</span> :
+                        <Skeleton type="text" width={"60px"} height={"100%"} />
+                    }
+                    {/* <span className="label-title">{avatarOwned != undefined ? avatarOwned : 0}</span> */}
+                  </div>
+                  <div className="label-value">
+                    {
+                      avatarOwned != undefined ?
+                        <span>Earn: {toFixed(avatarOwned * airdropUnits.avatar, 0)}</span> :
+                        <Skeleton type="text" width={"60px"} height={"100%"} />
+                    }
+
+                  </div>
+                </div>
+              </Grid>
+              <Grid item xs={6} sm={6} md={3} lg={3} className="grid-item"  >
+                <div className="label-container">
+                  <div className="label-arrange">
+                    <span className="label-title">NFT Listed</span>
+                    {
+                      avatarOwned != undefined ?
+                        <span className="label-title">{nftListed}</span> :
+                        <Skeleton type="text" width={"60px"} height={"100%"} />
+                    }
+
+                  </div>
+                  <div className="label-value">
+                    {
+                      avatarOwned != undefined ?
+                        <span>Earn: {toFixed(nftListed * airdropUnits.nft, 0)}</span> :
+                        <Skeleton type="text" width={"60px"} height={"100%"} />
+                    }
+                  </div>
+                </div>
+              </Grid>
+              <Grid item xs={6} sm={6} md={3} lg={3} className="grid-item"  >
+                <div className="label-container">
+                  <div className="label-arrange">
+                    <span className="label-title">Special NFT</span>
+                    {
+                      avatarOwned != undefined ?
+                        <span className="label-title">{specialNFT}</span> :
+                        <Skeleton type="text" width={"60px"} height={"100%"} />
+                    }
+                  </div>
+                  <div className="label-value">
+                    {
+                      avatarOwned != undefined ?
+                        <span>Earn: {toFixed(specialNFT * airdropUnits.specialNFT, 0)}</span> :
+                        <Skeleton type="text" width={"60px"} height={"100%"} />
+                    }
+
+                  </div>
+                </div>
+              </Grid>
+              <Grid item xs={6} sm={6} md={3} lg={3} className="grid-item"  >
+                <div className="label-container">
+                  <div className="label-arrange">
+                    <span className="label-title">Whitelisted</span>
+                    {
+                      avatarOwned != undefined ?
+                        <span className="label-title">{isWhitelist == true ? "Yes" : "No"}</span> :
+                        <Skeleton type="text" width={"60px"} height={"100%"} />
+                    }
+                  </div>
+                  <div className="label-value">
+                    {
+                      avatarOwned != undefined ?
+                        <span>Earn: {isWhitelist == true ? airdropUnits.whitelist : 0}</span> :
+                        <Skeleton type="text" width={"60px"} height={"100%"} />
+                    }
+                  </div>
+                </div>
+              </Grid>
+              <Grid item xs={6} sm={6} md={6} lg={6} className="grid-item"  >
+                <div className="label-container">
+                  <span className="label-title">Total Earned</span>
+                  <div className="label-value">
+                    {
+                      avatarOwned != undefined ?
+                        <span>{isReceived ? "You already received" : (totalEarned() + " SPOZZ")}</span> :
+                        <Skeleton type="text" width={"60px"} height={"100%"} />
+                    }
+                  </div>
+                </div>
+              </Grid>
+              <Grid item xs={6} sm={6} md={6} lg={6} className="grid-item"  >
+                <div className="label-container">
+                  <button
+                    className="claim-button"
+                    onClick={onClaim}
+                    disabled={
+                      isPendingTxn(pendingTransactions, "airdropping") || totalEarned() <= 0 || isReceived
+                    }
+                  >
+                    {txnButtonText(pendingTransactions, "airdropping", "Claim My SPOZZ")}
+                  </button>
+                </div>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
     </Grid >
   );
 }

@@ -86,7 +86,7 @@ function OhmMenu() {
   });
 
   const SOHM_ADDRESS = addresses[networkId] && addresses[networkId].TAZ_ADDRESS;
-  const OHM_ADDRESS = addresses[networkId] && addresses[networkId].OHM_ADDRESS;
+  const SPOZZ_ADDRESS = addresses[networkId] && addresses[networkId].SPOZZ_ADDRESS;
   const PT_TOKEN_ADDRESS = addresses[networkId] && addresses[networkId].TAZ_ADDRESS;
   const GOHM_ADDRESS = addresses[networkId] && addresses[networkId].GOHM_ADDRESS;
 
@@ -113,7 +113,7 @@ function OhmMenu() {
         color="primary"
         title="SPOZZ"
         aria-describedby={id}
-        onClick={addTokenToWallet("SPOZZ", OHM_ADDRESS, address)}
+        onClick={addTokenToWallet("SPOZZ", SPOZZ_ADDRESS, address)}
       >
         <SvgIcon component={InfoIcon} color="primary" />
         <span>ADD SPOZZ TO WALLET</span>

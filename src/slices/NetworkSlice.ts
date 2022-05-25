@@ -30,7 +30,7 @@ export const initializeNetwork = createAsyncThunk(
           uri = NodeHelper.getMainnetURI(id);
           break;
         case 4:
-          networkName = "Rinkeby Testnet";
+          networkName = "ETH";
           uri = NodeHelper.getMainnetURI(id);
           break;
         case 56:
@@ -38,7 +38,7 @@ export const initializeNetwork = createAsyncThunk(
           uri = NodeHelper.getMainnetURI(id);
           break;
         case 97:
-          networkName = "Binance Smart Chain Testnet";
+          networkName = "BSC";
           uri = NodeHelper.getMainnetURI(id);
           break;
         case 137:
@@ -46,7 +46,7 @@ export const initializeNetwork = createAsyncThunk(
           uri = NodeHelper.getMainnetURI(id);
           break;
         case 80001:
-          networkName = "Moombai";
+          networkName = "Polygon";
           uri = NodeHelper.getMainnetURI(id);
           break;
         case 42161:
@@ -124,7 +124,7 @@ export const switchNetwork = createAsyncThunk(
           dispatch(initializeNetwork({ provider }));
         } catch (e) {
           console.log(e);
-          dispatch(error("Error switching network!"));
+          dispatch(error("Error switching network! Please check wallet connect stauts"));
         }
       }
       // }
