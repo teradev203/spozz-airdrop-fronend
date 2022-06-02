@@ -35,7 +35,7 @@ export const getUserNFTBalance = createAsyncThunk(
 
     let isWhitelist = false;
     let isReceived = false;
-    let url = null;
+    let url = "https://deep-index.moralis.io/api";
     let polygonAirdropBalance = null;
     let ethAirdropBalance = null;
     let bscAirdropBalance = null;
@@ -48,7 +48,7 @@ export const getUserNFTBalance = createAsyncThunk(
       url = "https://deep-index.moralis.io/api/v2/" + address + "/nft?chain=mumbai&format=decimal";
 
     const res = await axios.get(url, {
-      headers: { "X-API-Key": "4SmDI5YhpMZtPebTPaSf5pXZ9NgPpNw1PyJKqHNQhkDG2o11WdW3m9IZTeTUqKBm" },
+      headers: { "X-API-Key": "iea1xCsNT6edUc6Xfu8ZqUorCRnshpsaC66IUaHOqbEnVFDK04qfeNsmGKikqJkn" },
     });
 
     // if (true) {

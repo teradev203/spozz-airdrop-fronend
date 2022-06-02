@@ -86,16 +86,16 @@ function MigrationModal({ open, handleClose }: { open: boolean; handleClose: any
   let isMigrationComplete = useAppSelector(state => state.account.isMigrationComplete);
 
   const onSeekApproval = (token: string) => {
-    dispatch(
-      changeMigrationApproval({
-        address,
-        networkID: networkId,
-        provider,
-        token: token.toLowerCase(),
-        displayName: token,
-        insertName: true,
-      }),
-    );
+    // dispatch(
+    //   changeMigrationApproval({
+    //     address,
+    //     networkID: networkId,
+    //     provider,
+    //     token: token.toLowerCase(),
+    //     displayName: token,
+    //     insertName: true,
+    //   }),
+    // );
   };
 
   const onMigrate = () => dispatch(migrateAll({ provider, address, networkID: networkId }));
